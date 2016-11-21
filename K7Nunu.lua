@@ -207,13 +207,18 @@ function Combo()
 		end
 
 		for _,ally in pairs(GetAllyHeroes()) do
-			if K7M.Combo.useW:Value() and Ready(_W) and GetDistance(localplayer,ally) <= 700 and EnemiesAround(GetOrigin(localplayer), 750) >= 1 and K7M.Combo.manaW:Value() <= GetPercentMP(localplayer) then
+			if K7M.Combo.useW:Value() and Ready(_W) and GetDistance(localplayer,ally) <= 700 and EnemiesAround(GetOrigin(localplayer), 1000) >= 1 and K7M.Combo.manaW:Value() <= GetPercentMP(localplayer) then
 				CastTargetSpell(ally, _W)
 			end
 		end
 
 		if K7M.Combo.useR:Value() and Ready(_R) and ValidTarget(entitytarget, 630) and EnemiesAround(GetOrigin(localplayer), 630) >= K7M.Combo.minenemiesR:Value() and K7M.Combo.manaR:Value() <= GetPercentMP(localplayer) then
+			DACR.attacksEnabled == false
+			DACR.movementEnabled == false 
 			CastSpell(_R)
+		else
+			DACR.attacksEnabled == true
+			DACR.movementEnabled == true
 		end
 	end
 end
