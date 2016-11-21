@@ -31,7 +31,6 @@ Skins =
 local entitytarget = GetCurrentTarget()
 require("DamageLib")
 require('Inspired')
-require('OpenPredict')
 local K7M = Menu("K7Teemo - Toxic Player", "K7Teemo")
 
 K7M:Menu("Combo", "Combo")
