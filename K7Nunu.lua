@@ -35,7 +35,7 @@ local K7M = Menu("K7Nunu", "K7Nunu")
 K7M:Menu("Combo", "Combo")
 K7M.Combo:Boolean("useW", "Use W", true)
 K7M.Combo:Boolean("useE", "Use E", true)
-K7M.Combo:Boolean("useR", "Use R", false)
+K7M.Combo:Boolean("useR", "Use R")
 K7M.Combo:Slider("manaW", "Min Mana To Use W", 30, 0, 100)
 K7M.Combo:Slider("manaR", "Min Mana To Use R", 45, 0, 100)
 K7M.Combo:Slider("minenemiesR", "Min Enemies for R", 3, 1, 5)
@@ -58,7 +58,7 @@ K7M.LaneClear:Slider("manaE", "Min Mana To Use E", 80, 0, 100)
 
 K7M:SubMenu('JungleClear', 'Jungle Clear')
 K7M.JungleClear:Boolean('useQ', 'Use Q', true)
-K7M.JungleClear:Boolean('useQ', 'Use W', false)
+K7M.JungleClear:Boolean('useQ', 'Use W')
 K7M.JungleClear:Boolean('useE', 'Use E', true)
 K7M.JungleClear:Slider("manaQ", "Min Mana To Use Q", 20, 0, 100)
 K7M.JungleClear:Slider("manaW", "Min Mana To Use W", 40, 0, 100)
@@ -104,11 +104,11 @@ OnDraw(function()
 
 		if Ready(_E) and K7M.Draws.drawE:Value() then
 			DrawCircle(localplayer,GetCastRange(localplayer,_E),1,25,GoS.Green)
+		end
 
 		if Ready(_R) and K7M.Draws.drawR:Value() then
 			DrawCircle(localplayer,GetCastRange(localplayer,_R),1,25,GoS.Yellow)
 		end
-
 	else
 
 		if K7M.Draws.drawQ:Value() then
