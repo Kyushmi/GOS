@@ -58,7 +58,7 @@ K7M.LaneClear:Slider("manaE", "Min Mana To Use E", 80, 0, 100)
 
 K7M:SubMenu('JungleClear', 'Jungle Clear')
 K7M.JungleClear:Boolean('useQ', 'Use Q', true)
-K7M.JungleClear:Boolean('useQ', 'Use W')
+K7M.JungleClear:Boolean('useW', 'Use W')
 K7M.JungleClear:Boolean('useE', 'Use E', true)
 K7M.JungleClear:Slider("manaQ", "Min Mana To Use Q", 20, 0, 100)
 K7M.JungleClear:Slider("manaW", "Min Mana To Use W", 40, 0, 100)
@@ -69,8 +69,6 @@ K7M.KS:Boolean('useE', 'Use E', true)
 
 K7M:SubMenu('LvL', 'Auto Level')
 K7M.LvL:Boolean('AutoLvL', 'Enable Auto LvL')
-K7M.LvL:Boolean('Jungle', 'Jungle')
-K7M.LvL:Boolean('AP', 'AP', true)
 
 K7M:SubMenu('SkinChanger', 'Skin Changer')
 K7M.SkinChanger:DropDown('skin', localplayer.charName.. " Skins", 1, Skins[localplayer.charName], function(model) HeroSkinChanger(localplayer, model - 1) end, true)
