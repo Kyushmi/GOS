@@ -216,7 +216,6 @@ function Combo()
 			--DACR.attacksEnabled = false
 			--DACR.movementEnabled = false 
 			CastSpell(_R)
-		else
 		end
 	end
 end
