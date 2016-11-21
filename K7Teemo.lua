@@ -1,4 +1,4 @@
-local K7Version = "1.0"
+local K7Version = "1.1"
 
 function AutoUpdate(data)
     if tonumber(data) > tonumber(K7Version) then
@@ -31,6 +31,7 @@ Skins =
 local entitytarget = GetCurrentTarget()
 require("DamageLib")
 require('Inspired')
+require('OpenPredict')
 local K7M = Menu("K7Teemo - Toxic Player", "K7Teemo")
 
 K7M:Menu("Combo", "Combo")
@@ -50,10 +51,7 @@ K7M.LastHit:Slider("manaQ", "Min Mana To Use Q", 60, 0, 100)
 
 K7M:SubMenu('LaneClear', 'Lane Clear')
 K7M.LaneClear:Boolean('useQ', 'Use Q', true)
-K7M.LaneClear:Boolean('useR', 'Use R', true)
 K7M.LaneClear:Slider("manaQ", "Min Mana To Use Q", 60, 0, 100)
-K7M.LaneClear:Slider("manaR", "Min Mana To Use R", 60, 0, 100)
-K7M.LaneClear:Slider("chargeR", "Charges of R before using R", 2, 1, 3)
 
 K7M:SubMenu('JungleClear', 'Jungle Clear')
 K7M.JungleClear:Boolean('useQ', 'Use Q', true)
@@ -73,6 +71,9 @@ K7M.LvL:Boolean('MaxQ', 'Q Max', true)
 K7M:SubMenu('SkinChanger', 'Skin Changer')
 K7M.SkinChanger:DropDown('skin', localplayer.charName.. " Skins", 1, Skins[localplayer.charName], function(model) HeroSkinChanger(localplayer, model - 1) end, true)
 
+K7M:SubMenu('Pred', 'Prediction Hitchance')
+K7M.Pred:Slider("HitchanceR", "Hitchance R", 60, 0, 100)
+
 K7M:SubMenu('Draws', 'Drawnings')
 K7M.Draws:Boolean("drawQ", "Draw Q range", true)
 K7M.Draws:Boolean("drawR", "Draw R range", true)
@@ -80,6 +81,8 @@ K7M.Draws:Boolean("drawReady", "Only draw when skills are ready")
 
 K7M:SubMenu('Gapcloser', 'Gapcloser')
 K7M.Gapcloser:Info("useQ", "Use Q on:")
+
+local TeemoR = {delay = 1.25, range = 900, radius = 250, speed = 1200}
 
 OnDraw(function()
 	
@@ -104,6 +107,13 @@ OnDraw(function()
 		end
 	end
 end)
+
+function CastR(unit)
+	local predictR = GetCircularAOEPrediction(unit, TeemoR)
+	if predictR.hitChance >= (K7M.Pred.HitchanceR:Value()*0.01) then
+		CastSkillShot(_R, predictR.castPos)
+	end
+end
 
 function KillSteal()
 	for _, enemy in pairs(GetEnemyHeroes()) do
@@ -133,24 +143,20 @@ end
 function LaneClear()
 	if Mix:Mode() == "LaneClear" then
 		for _, minion in pairs(minionManager.objects) do
-			if GetTeam(minion) == MINION_JUNGLE and K7M.JungleClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 680) and K7M.JungleClear.manaQ:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _Q)
-				IOW:ResetAA()
+			if GetTeam(minion) == MINION_JUNGLE then
+				local iCount = GetSpellData(localplayer, _R).ammo
+				if K7M.JungleClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 680) and K7M.JungleClear.manaQ:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _Q)
+				end
+				if K7M.JungleClear.useR:Value() and Ready(_R) and ValidTarget(minion, (250+ 150*GetCastLevel(localplayer,_R))) and K7M.JungleClear.chargeR:Value() <= iCount and K7M.JungleClear.manaR:Value() < GetPercentMP(localplayer) then
+					CastR(minion)
+				end
 			end
 
-			local iCount = GetSpellData(localplayer, _R).ammo
-
-			if GetTeam(minion) == MINION_JUNGLE and K7M.JungleClear.useR:Value() and Ready(_R) and ValidTarget(minion, (250+ 150*GetCastLevel(localplayer,_R))) and K7M.JungleClear.chargeR:Value() <= iCount and K7M.JungleClear.manaR:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _R)
-			end
-
-			if GetTeam(minion) ~= MINION_ALLY and K7M.LaneClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 680) and K7M.LaneClear.manaQ:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _Q)
-				IOW:ResetAA()
-			end
-
-			if GetTeam(minion) ~= MINION_ALLY and K7M.LaneClear.useR:Value() and Ready(_R) and ValidTarget(minion, (250+ 150*GetCastLevel(localplayer,_R))) and K7M.LaneClear.chargeR:Value() <= iCount and K7M.LaneClear.manaR:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _R)
+			if GetTeam(minion) ~= MINION_ALLY then
+				if K7M.LaneClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 680) and K7M.LaneClear.manaQ:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _Q)
+				end
 			end
 		end
 	end
@@ -194,7 +200,7 @@ function Combo()
 		local iCount = GetSpellData(localplayer, _R).ammo
 
 		if K7M.Combo.useR:Value() and Ready(_R) and ValidTarget(entitytarget, (250 + 150 * GetCastLevel(localplayer,_R))) and K7M.Combo.chargeR:Value() <= iCount and K7M.Combo.manaR:Value() <= GetPercentMP(localplayer) then
-			CastTargetSpell(entitytarget, _R)
+			CastR(entitytarget)
 		end
 	end
 end
