@@ -121,6 +121,7 @@ OnDraw(function()
 
 		if K7M.Draws.drawE:Value() then
 			DrawCircle(localplayer,GetCastRange(localplayer,_E),1,25,GoS.Green)
+		end
 
 		if K7M.Draws.drawR:Value() then
 			DrawCircle(localplayer,GetCastRange(localplayer,_R),1,25,GoS.Yellow)
