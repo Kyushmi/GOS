@@ -1,10 +1,10 @@
-local K7Version = "1.0"
+local K7Version = "1.1"
 
 function AutoUpdate(data)
     if tonumber(data) > tonumber(K7Version) then
-        PrintChat("<font color=\"#ffffff\">K7Nunu:</font> <font color=\"#adff2f\">New Version found</font> " .. data)
-        PrintChat("<font color=\"#ffffff\">K7Nunu:</font> <font color=\"#adff2f\">Downloading update, please wait...</font>")
-        DownloadFileAsync("https://raw.githubusercontent.com/Kyushmi/GoS/master/K7Nunu.lua", SCRIPT_PATH .. "K7Nunu.lua", function() PrintChat("<font color=\"#ffffff\">K7Nunu:</font> <font color=\"#adff2f\">Downloaded Update. Please 2x F6!</font>") return end)
+        PrintChat("<font color=\"#ffffff\"><b>K7Nunu:</b></font> <font color=\"#adff2f\">New Version found</font> " .. data)
+        PrintChat("<font color=\"#ffffff\"><b>K7Nunu:</b></font> <font color=\"#adff2f\">Downloading update, please wait...</font>")
+        DownloadFileAsync("https://raw.githubusercontent.com/Kyushmi/GoS/master/K7Nunu.lua", SCRIPT_PATH .. "K7Nunu.lua", function() PrintChat("<font color=\"#ffffff\"><b>K7Nunu:</b></font> <font color=\"#adff2f\">Downloaded Update. Please 2x F6!</font>") return end)
     else
 		PrintChat("<font color=\"#ffffff\">K7Nunu:</font> <font color=\"#adff2f\">No updates found!</font>")
     end
@@ -72,6 +72,10 @@ K7M.LvL:Boolean('AutoLvL', 'Enable Auto LvL')
 
 K7M:SubMenu('SkinChanger', 'Skin Changer')
 K7M.SkinChanger:DropDown('skin', localplayer.charName.. " Skins", 1, Skins[localplayer.charName], function(model) HeroSkinChanger(localplayer, model - 1) end, true)
+
+K7M:SubMenu('Misc', 'Misc')
+K7M.Misc:Boolean('useautoQ', 'Use Auto Q', true)
+K7M.Misc:Slider("autohealthQ", "Auto Q at health percentage", 30, 0, 100)
 
 K7M:SubMenu('Draws', 'Drawnings')
 K7M.Draws:Boolean("drawQ", "Draw Q range", true)
@@ -154,30 +158,41 @@ end
 function LaneClear()
 	if Mix:Mode() == "LaneClear" then
 		for _, minion in pairs(minionManager.objects) do
-			if GetTeam(minion) == MINION_JUNGLE and K7M.JungleClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 125) and K7M.JungleClear.manaQ:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _Q)
+			if GetTeam(minion) == MINION_JUNGLE then
+				if K7M.JungleClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 125) and K7M.JungleClear.manaQ:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _Q)
+				end
+
+				if K7M.JungleClear.useW:Value() and Ready(_W) and ValidTarget(minion, 140) and K7M.JungleClear.manaW:Value() < GetPercentMP(localplayer) then
+					CastSpell(_W)
+				end
+
+				if K7M.JungleClear.useE:Value() and Ready(_E) and ValidTarget(minion, 550) and K7M.JungleClear.manaE:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _E)
+				end
 			end
 
-			if GetTeam(minion) == MINION_JUNGLE and K7M.JungleClear.useW:Value() and Ready(_W) and ValidTarget(minion, 140) and K7M.JungleClear.manaW:Value() < GetPercentMP(localplayer) then
-				CastSpell(_W)
-			end
-
-			if GetTeam(minion) == MINION_JUNGLE and K7M.JungleClear.useE:Value() and Ready(_E) and ValidTarget(minion, 550) and K7M.JungleClear.manaE:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _E)
-			end
-
-			if GetTeam(minion) == MINION_ENEMY and K7M.LaneClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 125) and K7M.LaneClear.manaQ:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _Q)
-			end
+			if GetTeam(minion) == MINION_ENEMY then
+				if K7M.LaneClear.useQ:Value() and Ready(_Q) and ValidTarget(minion, 125) and K7M.LaneClear.manaQ:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _Q)
+				end
 
 
-			if GetTeam(minion) == MINION_ENEMY and K7M.LaneClear.useE:Value() and Ready(_E) and ValidTarget(minion, 550) and K7M.LaneClear.manaE:Value() < GetPercentMP(localplayer) then
-				CastTargetSpell(minion, _E)
+				if K7M.LaneClear.useE:Value() and Ready(_E) and ValidTarget(minion, 550) and K7M.LaneClear.manaE:Value() < GetPercentMP(localplayer) then
+					CastTargetSpell(minion, _E)
+				end
 			end
 		end
 	end
 end
 
+function AutoQ()
+	for _, minion in pairs(minionManager.objects) do
+	  if Ready(_Q) and K7M.Misc.useautoQ:Value() and IsObjectAlive(minion) and GetTeam(minion) ~= MINION_ALLY and GetDistance(minion) <= 125 and K7M.Misc.autohealthQ:Value() >= GetPercentHP(localplayer) then
+	  	CastTargetSpell(minion, _Q)
+	  end
+	end
+end
 
 function LastHit()
 	if Mix:Mode() == "LastHit" then
@@ -210,10 +225,10 @@ function Combo()
 			if K7M.Combo.useW:Value() and Ready(_W) and GetDistance(localplayer,ally) <= 700 and EnemiesAround(GetOrigin(localplayer), 1000) >= 1 and K7M.Combo.manaW:Value() <= GetPercentMP(localplayer) then
 				CastTargetSpell(ally, _W)
 			end
-		end
 
-		if K7M.Combo.useR:Value() and Ready(_R) and ValidTarget(entitytarget, 630) and EnemiesAround(GetOrigin(localplayer), 630) >= K7M.Combo.minenemiesR:Value() and K7M.Combo.manaR:Value() <= GetPercentMP(localplayer) then
-			CastSpell(_R)
+			if K7M.Combo.useR:Value() and Ready(_R) and ValidTarget(entitytarget, 630) and EnemiesAround(GetOrigin(localplayer), 630) >= K7M.Combo.minenemiesR:Value() and K7M.Combo.manaR:Value() <= GetPercentMP(localplayer) then
+				CastSpell(_R)
+			end
 		end
 	end
 end
@@ -232,9 +247,11 @@ end
 
 		LaneClear()
 
+		AutoQ()
+
 		AutoLvl()
 end)
 
 
 AddGapcloseEvent(_E, 680, true, K7M.Gapcloser)
-PrintChat("<font color=\"#ffffff\">K7Nunu:</font> <font color=\"#adff2f\">Injected successfully!</font>")
+PrintChat("<font color=\"#ffffff\"><b>K7Nunu:</b></font> <font color=\"#adff2f\">Injected successfully!</font>")
