@@ -299,3 +299,4 @@ end)
 
 AddGapcloseEvent(_Q, 680, true, K7M.Gapcloser)
 PrintChat("<font color=\"#ffffff\"><b>K7Teemo Toxic Player:</b></font> <font color=\"#adff2f\">Injected successfully!</font>")
+PrintChat("<font color=\"#ffffff\"><b>K7Teemo Toxic Player:</b></font> <font color=\"#adff2f\">If the script does not use skills, then press F6 x2!</font>")
