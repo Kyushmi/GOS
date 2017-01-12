@@ -1,4 +1,4 @@
-local K7Version = "1.2"
+local K7Version = "1.3"
 
 function AutoUpdate(data)
     if tonumber(data) > tonumber(K7Version) then
